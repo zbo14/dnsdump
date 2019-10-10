@@ -6,6 +6,7 @@ const resolve = promisify(dns.resolve)
 
 const rrtypes = [
   'A',
+  'AAAA',
   'CNAME',
   'MX',
   'NAPTR',
