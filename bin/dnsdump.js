@@ -31,7 +31,7 @@ const flatten = arr => {
 
 const stringify = (x, level = 0) => {
   if (Array.isArray(x)) {
-    return x.map(y => stringify(y, level)).join('\n')
+    return x.length ? x.map(y => stringify(y, level)).join('\n') : ''
   }
 
   if (x.constructor.name === 'Object') {
@@ -54,9 +54,19 @@ module.exports = async domain => {
       .catch(() => {})
   })
 
-  const result = (await Promise.all(promises))
-    .filter(Boolean)
-    .reduce((obj, result) => ({ ...obj, ...result }), {})
+  const arr = await Promise.all(promises)
+  const result = {}
+
+  arr.forEach(record => {
+    if (!record) return
+
+    const keys = Object.keys(record)
+    const value = record[keys[0]]
+
+    if (keys.length === 1 && Array.isArray(value) && !value.length) return
+
+    Object.assign(result, record)
+  })
 
   console.log(stringify(result))
 }
