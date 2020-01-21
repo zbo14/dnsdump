@@ -23,10 +23,33 @@ MX:
   exchange:
     abc.mail.com
   priority:
-    10
+    10,
   exchange:
     bcd.mail.com
   priority:
     5
 ...
+```
+
+or output JSON...
+
+```
+$ json=true dnsdump foobar.com
+
+{
+  "A": [
+    "1.2.3.4"
+  ],
+  "MX": [
+    {
+      "exchange": "abc.mail.com",
+      "priority": 10
+    },
+    {
+      "exchange": "bcd.mail.com",
+      "priority": 5
+    }
+  ],
+  ...
+}
 ```
