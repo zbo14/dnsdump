@@ -3,6 +3,10 @@
   "version": "1.2.0",
   "description": "Dumps a bunch of DNS data about a domain",
   "bin": "bin/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zbo14/dnsdump"
+  },
   "author": "Zachary Balder",
   "license": "MIT",
   "devDependencies": {

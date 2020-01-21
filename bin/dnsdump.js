@@ -17,21 +17,9 @@ const rrtypes = [
   'TXT'
 ]
 
-const flatten = arr => {
-  if (arr.length === 1) {
-    return Array.isArray(arr[0]) ? flatten(arr[0]) : arr[0]
-  }
-
-  if (Array.isArray(arr[0])) {
-    return arr.reduce((arr, subarr) => [...arr, ...subarr], [])
-  }
-
-  return arr
-}
-
 const stringify = (x, level = 0) => {
   if (Array.isArray(x)) {
-    return x.length ? x.map(y => stringify(y, level)).join('\n') : ''
+    return x.length ? x.map(y => stringify(y, level)).join(',\n') : ''
   }
 
   if (x.constructor.name === 'Object') {
@@ -45,12 +33,12 @@ const stringify = (x, level = 0) => {
 
 module.exports = async domain => {
   if (!domain) {
-    throw new Error('Usage: dnsdump DOMAIN')
+    throw new Error('Usage: [json=true] dnsdump <domain>')
   }
 
   const promises = rrtypes.map(rrtype => {
     return resolve(domain, rrtype)
-      .then(result => ({ [rrtype]: flatten(result) }))
+      .then(result => ({ [rrtype]: result.flatMap(x => x) }))
       .catch(() => {})
   })
 
@@ -68,5 +56,11 @@ module.exports = async domain => {
     Object.assign(result, record)
   })
 
-  console.log(stringify(result))
+  const json = (process.env.json || '').trim()
+
+  const str = json === 'true'
+    ? JSON.stringify(result, null, 2)
+    : stringify(result)
+
+  console.log(str)
 }
