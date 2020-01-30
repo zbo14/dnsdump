@@ -31,7 +31,7 @@ MX:
 ...
 ```
 
-or output JSON...
+or output JSON:
 
 ```
 $ json=true dnsdump foobar.com

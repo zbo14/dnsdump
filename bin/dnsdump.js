@@ -36,31 +36,29 @@ module.exports = async domain => {
     throw new Error('Usage: [json=true] dnsdump <domain>')
   }
 
-  const promises = rrtypes.map(rrtype => {
-    return resolve(domain, rrtype)
-      .then(result => ({ [rrtype]: result.flatMap(x => x) }))
-      .catch(() => {})
+  const results = {}
+
+  const promises = rrtypes.map(async rrtype => {
+    let result = await resolve(domain, rrtype).catch(() => {})
+
+    if (!result) return
+
+    if (Array.isArray(result)) {
+      result = result.flatMap(x => x).filter(Boolean)
+
+      if (!result.length) return
+    }
+
+    results[rrtype] = result
   })
 
-  const arr = await Promise.all(promises)
-  const result = {}
-
-  arr.forEach(record => {
-    if (!record) return
-
-    const keys = Object.keys(record)
-    const value = record[keys[0]]
-
-    if (keys.length === 1 && Array.isArray(value) && !value.length) return
-
-    Object.assign(result, record)
-  })
+  await Promise.all(promises)
 
   const json = (process.env.json || '').trim()
 
   const str = json === 'true'
-    ? JSON.stringify(result, null, 2)
-    : stringify(result)
+    ? JSON.stringify(results, null, 2)
+    : stringify(results)
 
   console.log(str)
 }
