@@ -31,12 +31,22 @@ const stringify = (x, level = 0) => {
   return '  '.repeat(level) + x
 }
 
-module.exports = async domain => {
+module.exports = async (domain, ...servers) => {
   if (!domain) {
-    throw new Error('Usage: [json=true] dnsdump <domain>')
+    throw new Error('Usage: [json=true] dnsdump <domain> [server1] [server2] ...')
   }
 
-  const results = {}
+  const json = (process.env.json || '').trim()
+  const toString = json === 'true' ? JSON.stringify : stringify
+
+  servers.length && dns.setServers(servers)
+
+  const str = 'Querying DNS servers: ' +
+    dns.getServers()
+      .map(addr => `"${addr}"`)
+      .join(', ')
+
+  console.log(str)
 
   const promises = rrtypes.map(async rrtype => {
     let result = await resolve(domain, rrtype).catch(() => {})
@@ -49,16 +59,12 @@ module.exports = async domain => {
       if (!result.length) return
     }
 
-    results[rrtype] = result
+    const str = toString({ [rrtype]: result })
+
+    console.log(str)
   })
 
   await Promise.all(promises)
 
-  const json = (process.env.json || '').trim()
-
-  const str = json === 'true'
-    ? JSON.stringify(results, null, 2)
-    : stringify(results)
-
-  console.log(str)
+  console.log('Done!')
 }
