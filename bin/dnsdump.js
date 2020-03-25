@@ -46,7 +46,7 @@ module.exports = async (domain, ...servers) => {
       .map(addr => `"${addr}"`)
       .join(', ')
 
-  console.log(str)
+  console.warn(str)
 
   const promises = rrtypes.map(async rrtype => {
     let result = await resolve(domain, rrtype).catch(() => {})
@@ -66,5 +66,5 @@ module.exports = async (domain, ...servers) => {
 
   await Promise.all(promises)
 
-  console.log('Done!')
+  console.warn('Done!')
 }
