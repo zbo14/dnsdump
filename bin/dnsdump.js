@@ -36,7 +36,7 @@ module.exports = async (domain, ...servers) => {
     throw new Error('Usage: [json=true] dnsdump <domain> [server1] [server2] ...')
   }
 
-  const json = (process.env.json || '').trim()
+  const json = (process.env.json || '').trim().toLowerCase()
   const toString = json === 'true' ? JSON.stringify : stringify
 
   servers.length && dns.setServers(servers)
