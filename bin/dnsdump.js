@@ -41,7 +41,7 @@ module.exports = async (domain, ...servers) => {
 
   servers.length && dns.setServers(servers)
 
-  const str = 'Querying DNS servers: ' +
+  const str = '[-] Querying DNS servers ' +
     dns.getServers()
       .map(addr => `"${addr}"`)
       .join(', ')
@@ -65,6 +65,4 @@ module.exports = async (domain, ...servers) => {
   })
 
   await Promise.all(promises)
-
-  console.warn('Done!')
 }
