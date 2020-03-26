@@ -13,8 +13,7 @@ const rrtypes = [
   'NS',
   'PTR',
   'SOA',
-  'SRV',
-  'TXT'
+  'SRV'
 ]
 
 const stringify = (x, level = 0) => {
@@ -33,11 +32,8 @@ const stringify = (x, level = 0) => {
 
 module.exports = async (domain, ...servers) => {
   if (!domain) {
-    throw new Error('Usage: [json=true] dnsdump <domain> [server1] [server2] ...')
+    throw new Error('Usage: dnsdump <domain> [server1] [server2] ...')
   }
-
-  const json = (process.env.json || '').trim().toLowerCase()
-  const toString = json === 'true' ? JSON.stringify : stringify
 
   servers.length && dns.setServers(servers)
 
@@ -59,7 +55,13 @@ module.exports = async (domain, ...servers) => {
       if (!result.length) return
     }
 
-    const str = toString({ [rrtype]: result })
+    if (rrtype === 'MX') {
+      result = result
+        .sort((a, b) => a.priority > b.priority ? 1 : -1)
+        .map(({ exchange }) => exchange)
+    }
+
+    const str = stringify({ [rrtype]: result })
 
     console.log(str)
   })
